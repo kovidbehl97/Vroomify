@@ -1,75 +1,167 @@
-'use client';
+// app/signup/page.tsx
+"use client"; // Required for hooks like useState, useRouter, useEffect, useAuth
 
-import React, { useState } from 'react';
-import { signUpWithEmail, signInWithGoogle } from '../../auth/auth';
+import React, { useState, useEffect, FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import {
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
+import GoogleSignInButton  from "../../components/GoogleSignInButton"; // Adjust path as needed
+import { auth } from "../../auth/firebase"; // Adjust path as needed
+import { useAuth } from "../../context/AuthContext"; // Adjust path as needed
 
-function SignUpPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+export default function SignupPage() {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false); // Loading state for submission
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const { data, error } = await signUpWithEmail(email, password);
-    if (error) {
-      setError(error.message);
-    } else {
-      alert('Check your email for confirmation!');
+  const router = useRouter();
+  const { user, loading: authLoading } = useAuth(); // Get user and auth loading state
+
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.push("/"); // Or your desired logged-in destination
+    }
+  }, [user, authLoading, router]);
+
+  const handleSignup = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault(); // Prevent default form submission
+    setError(null); // Clear previous errors
+
+    // Basic Validation
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+    if (password.length < 6) {
+      setError("Password should be at least 6 characters long.");
+      return;
+    }
+
+    setLoading(true); // Start loading indicator
+
+    try {
+      // Attempt to create user with Firebase Auth
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      console.log("Signup successful:", userCredential.user);
+      // Redirect upon successful signup
+      // The onAuthStateChanged listener in AuthContext will handle the user state update,
+      // and the useEffect above might handle redirect, or you can push here.
+      router.push("/dashboard"); // Example: Redirect to dashboard after signup
+    } catch (err: any) {
+      // Catch specific Firebase errors
+      console.error("Signup Error:", err);
+      // Provide user-friendly error messages
+      switch (err.code) {
+        case "auth/email-already-in-use":
+          setError("This email address is already registered.");
+          break;
+        case "auth/invalid-email":
+          setError("Please enter a valid email address.");
+          break;
+        case "auth/weak-password":
+          setError("Password is too weak. Please choose a stronger password.");
+          break;
+        default:
+          setError("An unexpected error occurred. Please try again.");
+      }
+    } finally {
+      setLoading(false); // Stop loading indicator regardless of outcome
     }
   };
 
-  const handleGoogleSignUp = async () => {
-    const { error } = await signInWithGoogle();
-    if (error) {
-      setError(error.message);
-    }
-    // No success alert needed here; Supabase redirects to Google
-  };
+  // Don't render the form if initial auth check is loading or user is already logged in
+  if (authLoading || user) {
+    return <div>Loading...</div>; // Or a spinner component
+  }
 
+  // Render the signup form
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md p-8 bg-white rounded shadow">
-        <h1 className="text-2xl font-bold mb-6">Sign Up</h1>
-        <form onSubmit={handleSignUp} className="space-y-4">
-          <div>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email"
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-          <div>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
-          >
-            Sign Up
-          </button>
-        </form>
-        <div className="mt-4">
-          <button
-            onClick={handleGoogleSignUp}
-            className="w-full bg-red-500 text-white p-2 rounded hover:bg-red-600"
-          >
-            Sign Up with Google
-          </button>
+    <div style={{ maxWidth: "400px", margin: "auto", padding: "2rem" }}>
+      <h2>Sign Up</h2>
+      <form onSubmit={handleSignup}>
+        <div style={{ marginBottom: "1rem" }}>
+          <label htmlFor="email">Email:</label>
+          <br />
+          <input
+            type="email"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            disabled={loading}
+            style={{ width: "100%", padding: "0.5rem" }}
+          />
         </div>
-        {error && <p className="text-red-500 mt-4">{error}</p>}
-      </div>
+        <div style={{ marginBottom: "1rem" }}>
+          <label htmlFor="password">Password:</label>
+          <br />
+          <input
+            type="password"
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            minLength={6} // Basic HTML5 validation
+            disabled={loading}
+            style={{ width: "100%", padding: "0.5rem" }}
+          />
+        </div>
+        <div style={{ marginBottom: "1rem" }}>
+          <label htmlFor="confirmPassword">Confirm Password:</label>
+          <br />
+          <input
+            type="password"
+            id="confirmPassword"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            minLength={6}
+            disabled={loading}
+            style={{ width: "100%", padding: "0.5rem" }}
+          />
+        </div>
+
+        {error && <p style={{ color: "red", marginBottom: "1rem" }}>{error}</p>}
+
+        <button
+          type="submit"
+          disabled={loading}
+          style={{
+            padding: "0.75rem 1.5rem",
+            cursor: loading ? "not-allowed" : "pointer",
+            width: "100%",
+          }}
+        >
+          {loading ? "Signing Up..." : "Sign Up"}
+        </button>
+      </form>
+      <p style={{ marginTop: "1rem" }}>
+        Already have an account?{" "}
+        <Link href="/logIn" style={{ textDecoration: "underline" }}>
+          Login here
+        </Link>
+      </p>
+      <GoogleSignInButton
+                onError={setError}
+                onSuccess={() => {
+                    console.log('Google login successful');
+                    // Redirect is handled by the useEffect checking `user` state change,
+                    // or you can explicitly push here: router.push('/dashboard');
+                }}
+                loading={loading}
+                setLoading={setLoading}
+            />
     </div>
   );
 }
-
-export default SignUpPage;
