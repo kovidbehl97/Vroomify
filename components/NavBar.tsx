@@ -6,7 +6,6 @@ import { useAuth } from "../context/AuthContext";
 import { signOut } from "firebase/auth";
 import { auth } from "../auth/firebase";
 
-
 function NavBar() {
   const pathname = usePathname();
   const { user, loading } = useAuth();
@@ -21,7 +20,7 @@ function NavBar() {
     try {
       await signOut(auth);
       console.log("User signed out successfully");
-      router.push("/logIn"); // Redirect to login page after sign out
+      router.push("/"); // Redirect to login page after sign out
     } catch (error: any) {
       console.error("Error signing out:", error);
       // Optionally display an error message to the user
@@ -29,9 +28,9 @@ function NavBar() {
   };
 
   // Don't render the navbar on login and signup pages
-  if (pathname === "/signUp" || pathname === "/logIn") {
-    return null;
-  }
+  // if (pathname === "/signUp" || pathname === "/logIn") {
+  //   return null;
+  // }
 
   return (
     <div
@@ -41,13 +40,29 @@ function NavBar() {
       <ul>
         {isLoggedIn ? (
           <li>
-            <button onClick={handleSignOut} style={{ cursor: 'pointer', border: 'none', background: 'none', padding: 0 }}>
+            <button
+              onClick={handleSignOut}
+              style={{
+                cursor: "pointer",
+                border: "none",
+                background: "none",
+                padding: 0,
+              }}
+            >
               Sign Out
             </button>
           </li>
         ) : (
           <li>
-            <Link href="/logIn">Log In</Link>
+            <Link
+              href={
+                pathname === "/signUp" || pathname === "/logIn" ? "/" : "/logIn"
+              }
+            >
+              {pathname === "/signUp" || pathname === "/logIn"
+                ? "Home"
+                : "LogIn"}
+            </Link>
           </li>
         )}
       </ul>
