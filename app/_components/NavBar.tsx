@@ -1,72 +1,50 @@
-"use client";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
-import { useAuth } from "../_context/AuthContext";
+'use client';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { User } from '../_lib/types';
 
-
-function NavBar() {
-  const pathname = usePathname();
-  const { user, loading } = useAuth();
-  const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+export default function Navbar() {
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    setIsLoggedIn(!!user); // Update login status based on user object
-  }, [user]);
+    const token = localStorage.getItem('token');
+    if (token) {
+      // Fetch user data or decode token
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => res.json())
+        .then((data) => setUser(data.user))
+        .catch(() => localStorage.removeItem('token'));
+    }
+  }, []);
 
   const handleSignOut = async () => {
-    try {
-      await signOut(auth);
-      console.log("User signed out successfully");
-      router.push("/"); // Redirect to login page after sign out
-    } catch (error: any) {
-      console.error("Error signing out:", error);
-      // Optionally display an error message to the user
-    }
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/signout`, { method: 'POST' });
+    localStorage.removeItem('token');
+    setUser(null);
   };
 
-  // Don't render the navbar on login and signup pages
-  // if (pathname === "/signUp" || pathname === "/logIn") {
-  //   return null;
-  // }
-
   return (
-    <div
-      className={`absolute top-0 left-0 w-full h-[100px] flex justify-between items-center px-20 z-[1]`}
-    >
-      <div>Vroomify</div>
-      <ul>
-        {isLoggedIn ? (
-          <li>
-            <button
-              onClick={handleSignOut}
-              style={{
-                cursor: "pointer",
-                border: "none",
-                background: "none",
-                padding: 0,
-              }}
-            >
-              Sign Out
-            </button>
-          </li>
-        ) : (
-          <li>
-            <Link
-              href={
-                pathname === "/signUp" || pathname === "/logIn" ? "/" : "/logIn"
-              }
-            >
-              {pathname === "/signUp" || pathname === "/logIn"
-                ? "Home"
-                : "LogIn"}
-            </Link>
-          </li>
-        )}
-      </ul>
-    </div>
+    <nav className="bg-gray-800 text-white p-4">
+      <div className="container mx-auto flex justify-between">
+        <Link href="/">Vroomify</Link>
+        <div>
+          <Link href="/cars" className="mx-2">Cars</Link>
+          {user ? (
+            <>
+              <Link href="/history" className="mx-2">Booking History</Link>
+              {user.role === 'admin' && <Link href="/dashboard" className="mx-2">Dashboard</Link>}
+              <button onClick={handleSignOut} className="mx-2">Sign Out</button>
+            </>
+          ) : (
+            <>
+              <Link href="/login" className="mx-2">Login</Link>
+              <Link href="/register" className="mx-2">Register</Link>
+            </>
+          )}
+        </div>
+      </div>
+    </nav>
   );
 }
-
-export default NavBar;
