@@ -1,12 +1,18 @@
 'use client';
 import { useState } from 'react';
 
-export default function SearchBar({ onSearch }: { onSearch: (value: string) => void }) {
+interface SearchBarProps {
+  onSearch: (value: string) => void;
+  onPageReset: () => void; // ADD THIS PROP
+}
+
+export default function SearchBar({ onSearch, onPageReset }: SearchBarProps) {
   const [value, setValue] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSearch(value);
+    onPageReset(); // CALL THE RESET FUNCTION
   };
 
   return (

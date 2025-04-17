@@ -18,8 +18,7 @@ export default function BookingPage() {
       if (!token) throw new Error('Please login');
       
       await createBooking(
-        { carId: id as string, startDate, endDate, totalPrice },
-        token
+        { carId: id as string, startDate, endDate, totalPrice }
       );
       router.push('/checkout');
     } catch (err) {

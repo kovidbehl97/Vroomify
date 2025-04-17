@@ -1,14 +1,14 @@
-import { MongoClient, ObjectId } from 'mongodb';
+import { ObjectId } from 'mongodb';
 import { NextResponse } from 'next/server';
-import { getSession } from 'next-auth/react';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../../../api/auth/[...nextauth]/route'; // Adjust path as needed
+import { getMongoClient } from '../../../_lib/mongodb'; // Adjust path as needed
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
-    const client = new MongoClient(process.env.MONGODB_URI!);
-    await client.connect();
-    const db = client.db('vroomify');
+    const client = await getMongoClient();
+    const db = client.db('cars');
     const car = await db.collection('cars').findOne({ _id: new ObjectId(params.id) });
-    await client.close();
     if (!car) {
       return NextResponse.json({ error: 'Car not found' }, { status: 404 });
     }
@@ -19,20 +19,25 @@ export async function GET(request: Request, { params }: { params: { id: string }
 }
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
-  const session = await getSession({ req: request });
-  if (!session || session.user.role !== 'admin') {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user || session.user.role !== 'admin') {
     return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
   }
   try {
     const { make, model, year, pricePerDay, available } = await request.json();
-    const client = new MongoClient(process.env.MONGODB_URI!);
-    await client.connect();
-    const db = client.db('vroomify');
+    const updateFields: any = {};
+    if (make) updateFields.make = make;
+    if (model) updateFields.model = model;
+    if (year) updateFields.year = year;
+    if (pricePerDay) updateFields.pricePerDay = pricePerDay;
+    if (available !== undefined) updateFields.available = available;
+
+    const client = await getMongoClient();
+    const db = client.db('cars');
     const result = await db.collection('cars').updateOne(
       { _id: new ObjectId(params.id) },
-      { $set: { make, model, year, pricePerDay, available } }
+      { $set: updateFields }
     );
-    await client.close();
     if (result.matchedCount === 0) {
       return NextResponse.json({ error: 'Car not found' }, { status: 404 });
     }
@@ -43,16 +48,14 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 }
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
-  const session = await getSession({ req: request });
-  if (!session || session.user.role !== 'admin') {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user || session.user.role !== 'admin') {
     return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
   }
   try {
-    const client = new MongoClient(process.env.MONGODB_URI!);
-    await client.connect();
-    const db = client.db('vroomify');
+    const client = await getMongoClient();
+    const db = client.db('cars');
     const result = await db.collection('cars').deleteOne({ _id: new ObjectId(params.id) });
-    await client.close();
     if (result.deletedCount === 0) {
       return NextResponse.json({ error: 'Car not found' }, { status: 404 });
     }

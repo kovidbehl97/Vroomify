@@ -16,33 +16,46 @@ export default function CarCatalogue() {
   const [carType, setCarType] = useState('');
   const [transmission, setTransmission] = useState('');
 
+  const resetPage = () => {
+    setPage(1);
+  };
+
   useEffect(() => {
     async function loadCars() {
       try {
-        const data = await fetchCars({ search, carType, transmission, page, limit });
-        setCars(data.cars);
-        setTotal(data.total);
+        const { cars: fetchedCars, total: totalCount } = await fetchCars({
+          search,
+          carType,
+          transmission,
+          page,
+          limit,
+        });
+        console.log('Fetched cars:', fetchedCars, 'Total:', totalCount);
+        setCars(fetchedCars);
+        setTotal(totalCount);
       } catch (error) {
         console.error('Error fetching cars:', error);
       }
     }
     loadCars();
-  }, [search, carType, transmission, page]);
+  }, [search, carType, transmission, page, limit]);
 
   return (
     <section className="container mx-auto py-10">
       <h2 className="text-2xl font-bold mb-6">Our Cars</h2>
       <div className="flex mb-6">
-        <SearchBar onSearch={setSearch} />
+        <SearchBar onSearch={setSearch} onPageReset={resetPage} /> {/* PASS resetPage */}
         <Filter
           label="Car Type"
           options={['SUV', 'Sedan', 'Hatchback']}
           onChange={setCarType}
+          onPageReset={resetPage} // PASS resetPage
         />
         <Filter
           label="Transmission"
           options={['Automatic', 'Manual']}
           onChange={setTransmission}
+          onPageReset={resetPage} // PASS resetPage
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

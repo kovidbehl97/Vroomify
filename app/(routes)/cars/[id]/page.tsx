@@ -35,7 +35,7 @@ export default function CarDetails() {
       <p>Mileage: {car.mileage} miles</p>
       <p>Type: {car.carType}</p>
       <p>Transmission: {car.transmission}</p>
-      <Link href={`/booking/${car._id}`} className="bg-blue-600 text-white px-4 py-2 rounded mt-4 inline-block">
+      <Link href={`/bookings/${car._id}`} className="bg-blue-600 text-white px-4 py-2 rounded mt-4 inline-block">
         Book Now
       </Link>
     </div>
