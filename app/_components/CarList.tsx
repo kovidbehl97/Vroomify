@@ -1,15 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { db } from "../auth/firebase";
-import {
-  collection,
-  getDocs,
-  query,
-  limit,
-  orderBy,
-  startAfter,
-  where,
-} from "firebase/firestore";
+
 import Link from "next/link"; // Import the Link component from Next.js
 
 interface Car {

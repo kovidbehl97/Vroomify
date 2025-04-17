@@ -3,7 +3,7 @@
 
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation"; // Use next/navigation for App Router
-import { useAuth } from "../context/AuthContext"; // Adjust path as needed
+import { useAuth } from "../_context/AuthContext"; // Adjust path as needed
 
 interface ProtectedRouteProps {
   children: React.ReactNode;

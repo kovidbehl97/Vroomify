@@ -9,9 +9,9 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
-import GoogleSignInButton  from "../../components/GoogleSignInButton"; // Adjust path as needed
+import GoogleSignInButton from "../../../components/GoogleSignInButton"; // Adjust path as needed
 import { auth } from "../../auth/firebase"; // Adjust path as needed
-import { useAuth } from "../../context/AuthContext"; // Adjust path as needed
+import { useAuth } from "../../_context/AuthContext"; // Adjust path as needed
 
 export default function SignupPage() {
   const [email, setEmail] = useState<string>("");
@@ -153,15 +153,15 @@ export default function SignupPage() {
         </Link>
       </p>
       <GoogleSignInButton
-                onError={setError}
-                onSuccess={() => {
-                    console.log('Google login successful');
-                    // Redirect is handled by the useEffect checking `user` state change,
-                    // or you can explicitly push here: router.push('/dashboard');
-                }}
-                loading={loading}
-                setLoading={setLoading}
-            />
+        onError={setError}
+        onSuccess={() => {
+          console.log("Google login successful");
+          // Redirect is handled by the useEffect checking `user` state change,
+          // or you can explicitly push here: router.push('/dashboard');
+        }}
+        loading={loading}
+        setLoading={setLoading}
+      />
     </div>
   );
 }
