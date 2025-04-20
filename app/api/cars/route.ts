@@ -1,10 +1,12 @@
+// api/cars/route.ts
 import { MongoClient, ObjectId } from 'mongodb';
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]/route';
-import { getMongoClient } from '../../_lib/mongodb';
+import { getMongoClient } from '../../_lib/mongodb'; // Assuming getMongoClient is here
 
 export async function GET(request: Request) {
+  // No 'client' declaration needed outside try/catch now that finally is gone
   try {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search') || '';
@@ -13,8 +15,10 @@ export async function GET(request: Request) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
 
+    // Get the connected client (getMongoClient should handle connection pooling)
     const client = await getMongoClient();
-    const db = client.db('cars');
+    const db = client.db('cars'); // Or use getMongoDb() if you added it
+
     let query: any = {};
 
     if (search) {
@@ -44,6 +48,7 @@ export async function GET(request: Request) {
     console.error('GET /api/cars - Error:', error);
     return NextResponse.json({ error: 'Internal Server Error', message: error.message }, { status: 500 });
   }
+  // Removed the finally block that closes the client
 }
 
 export async function POST(request: Request) {
@@ -51,13 +56,17 @@ export async function POST(request: Request) {
   if (!session || !session.user || session.user.role !== 'admin') {
     return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
   }
+  // No 'client' declaration needed outside try/catch now that finally is gone
   try {
     const { make, model, year, pricePerDay, mileage, carType, transmission } = await request.json();
     if (!make || !model || !year || !pricePerDay || !mileage || !carType || !transmission) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
+
+    // Get the connected client (getMongoClient should handle connection pooling)
     const client = await getMongoClient();
-    const db = client.db('cars');
+    const db = client.db('cars'); // Or use getMongoDb()
+
     const result = await db.collection('cars').insertOne({
       make,
       model,
@@ -76,4 +85,5 @@ export async function POST(request: Request) {
     console.error('POST /api/cars - Error:', error);
     return NextResponse.json({ error: 'Internal Server Error', message: error.message }, { status: 500 });
   }
+  
 }

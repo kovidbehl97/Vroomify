@@ -1,70 +1,54 @@
-'use client';
-import { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { createBooking } from '../../../_lib/api';
+// app/(routes)/bookings/[id]/page.tsx (This is now a Server Component)
 
-export default function BookingPage() {
-  const { id } = useParams();
-  const router = useRouter();
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [totalPrice, setTotalPrice] = useState(0);
-  const [error, setError] = useState('');
+import { redirect } from "next/navigation";
+// Can still use useParams in Server Component for dynamic segments
+import BookingFormClient from '../../../_components/BookingForm'; // Import the new Client Component
+import { getServerSession } from "next-auth";
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('Please login');
-      
-      await createBooking(
-        { carId: id as string, startDate, endDate, totalPrice }
-      );
-      router.push('/checkout');
-    } catch (err) {
-      setError('Failed to create booking');
-    }
-  };
+// You might want to fetch car details here on the server too for initial render
+// import { connectToDatabase } from '@/lib/mongodb'; // Your DB connection
+// import { ObjectId } from 'mongodb';
 
+
+export default async function BookingPage({params}: { params: { id: string } }) {
+  const session = await getServerSession(); // Get session on the server
+
+  // Basic Authentication Check
+  if (!session || !session.user) {
+    console.log("No session found, redirecting to login from Server Component");
+    redirect("/login"); // *** Perform redirect on the SERVER ***
+  }
+
+  // Get car ID from params - useParams() works in Server Components for dynamic segments
+
+  const carId = params.id as string; // Ensure id is treated as string
+
+  // --- Optional: Fetch car details on the server ---
+  // This is often more performant as it happens before the client renders
+  // try {
+  //   const client = await connectToDatabase();
+  //   const db = client.db('your_db_name');
+  //   const car = await db.collection('cars').findOne({ _id: new ObjectId(carId) });
+  //   if (!car) {
+  //      // Handle car not found - redirect or show error
+  //      redirect('/cars'); // Example: redirect to cars list
+  //   }
+  //   const carPrice = car.price;
+  //   // Pass carPrice to the Client Component
+  // } catch (error) {
+  //   console.error("Failed to fetch car details on server:", error);
+  //    // Handle server error - display error or redirect
+  //    redirect('/error-page');
+  // }
+
+
+  // If authenticated, render the Client Component for the interactive form
   return (
-    <div className="container mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-6">Book Your Car</h1>
-      <form onSubmit={handleSubmit} className="max-w-md">
-        <div className="mb-4">
-          <label className="block mb-1">Start Date</label>
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="border p-2 rounded w-full"
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block mb-1">End Date</label>
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="border p-2 rounded w-full"
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block mb-1">Total Price ($)</label>
-          <input
-            type="number"
-            value={totalPrice}
-            onChange={(e) => setTotalPrice(Number(e.target.value))}
-            className="border p-2 rounded w-full"
-            required
-          />
-        </div>
-        {error && <p className="text-red-600">{error}</p>}
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
-          Proceed to Checkout
-        </button>
-      </form>
-    </div>
+    <BookingFormClient
+      carId={carId}
+      // Pass any data fetched on the server to the client component here, e.g.:
+      // initialCarPrice={carPrice}
+      // userId={session.user.id} // Pass the user ID for booking creation
+    />
   );
 }

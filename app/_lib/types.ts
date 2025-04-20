@@ -1,3 +1,4 @@
+//app/_lib/types.ts
 export interface Car {
   _id: string;
   make: string;

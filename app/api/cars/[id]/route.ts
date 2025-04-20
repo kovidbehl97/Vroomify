@@ -1,3 +1,4 @@
+// api/cars/[id]/route.ts
 import { ObjectId } from 'mongodb';
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
@@ -6,16 +7,20 @@ import { getMongoClient } from '../../../_lib/mongodb'; // Adjust path as needed
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
+    // Get the connected client (getMongoClient should handle connection pooling)
     const client = await getMongoClient();
     const db = client.db('cars');
-    const car = await db.collection('cars').findOne({ _id: new ObjectId(params.id) });
+    const paramsData = params // params is already awaited by Next.js
+    const car = await db.collection('cars').findOne({ _id: new ObjectId(paramsData.id) });
     if (!car) {
       return NextResponse.json({ error: 'Car not found' }, { status: 404 });
     }
     return NextResponse.json(car);
   } catch (error) {
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    console.error('GET /api/cars/[id] - Error:', error);
+    return NextResponse.json({ error: 'Internal Server Error', message: (error as any).message }, { status: 500 });
   }
+  // No finally block here - Correct
 }
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
@@ -32,6 +37,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     if (pricePerDay) updateFields.pricePerDay = pricePerDay;
     if (available !== undefined) updateFields.available = available;
 
+    // Get the connected client (getMongoClient should handle connection pooling)
     const client = await getMongoClient();
     const db = client.db('cars');
     const result = await db.collection('cars').updateOne(
@@ -43,8 +49,10 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     }
     return NextResponse.json({ message: 'Car updated' });
   } catch (error) {
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    console.error('PUT /api/cars/[id] - Error:', error);
+    return NextResponse.json({ error: 'Internal Server Error', message: (error as any).message }, { status: 500 });
   }
+  // No finally block here - Correct
 }
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
@@ -53,6 +61,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
   }
   try {
+    // Get the connected client (getMongoClient should handle connection pooling)
     const client = await getMongoClient();
     const db = client.db('cars');
     const result = await db.collection('cars').deleteOne({ _id: new ObjectId(params.id) });
@@ -61,6 +70,8 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     }
     return NextResponse.json({ message: 'Car deleted' });
   } catch (error) {
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+     console.error('DELETE /api/cars/[id] - Error:', error);
+    return NextResponse.json({ error: 'Internal Server Error', message: (error as any).message }, { status: 500 });
   }
+   // No finally block here - Correct
 }

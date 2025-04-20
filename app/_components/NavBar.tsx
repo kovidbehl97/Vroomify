@@ -1,46 +1,90 @@
-'use client';
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { User } from '../_lib/types';
+// File: app/components/Navbar.tsx
+"use client";
+// Remove useState, useEffect, and your custom fetch
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useSession, signIn, signOut } from "next-auth/react";
 
 export default function Navbar() {
-  const [user, setUser] = useState<User | null>(null);
+  // Use the useSession hook provided by next-auth
+  // session will contain user info (name, email, id, role etc.) if authenticated
+  // status can be 'loading', 'authenticated', 'unauthenticated'
+  const { data: session, status } = useSession();
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      // Fetch user data or decode token
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-        .then((res) => res.json())
-        .then((data) => setUser(data.user))
-        .catch(() => localStorage.removeItem('token'));
-    }
-  }, []);
+  const pathname = usePathname(); // Get the current path
 
-  const handleSignOut = async () => {
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/signout`, { method: 'POST' });
-    localStorage.removeItem('token');
-    setUser(null);
-  };
+  // console.log('Navbar Rendering with useSession. Status:', status, 'Session:', session); // Keep for debugging if needed
+
+  const isUserLoggedIn = status === "authenticated";
+  const isLoginPage = pathname === "/login";
+  const isRegisterPage = pathname === "/register";
+  // const isAuthPage = isLoginPage || isRegisterPage; // isAuthPage variable is not strictly needed
+
+  // Show a loading state or basic navbar while session status is loading
 
   return (
     <nav className="bg-gray-800 text-white p-4">
-      <div className="container mx-auto flex justify-between">
-        <Link href="/">Vroomify</Link>
+      <div className="container mx-auto flex justify-between items-center">
+        {/* Always show the site title linking to Home */}
+        <Link href="/" className="text-xl font-bold hover:underline">
+          Vroomify
+        </Link>
+
+        {/* Navigation Links */}
         <div>
-          <Link href="/cars" className="mx-2">Cars</Link>
-          {user ? (
+          {/* Always show Home */}
+          {pathname !== "/" 
+          && (<Link href="/" className="mx-2 hover:underline">
+              Home
+            </Link>
+          )}
+          {isUserLoggedIn ? (
+            // --- Links for Logged-in Users (using session data) ---
             <>
-              <Link href="/history" className="mx-2">Booking History</Link>
-              {user.role === 'admin' && <Link href="/dashboard" className="mx-2">Dashboard</Link>}
-              <button onClick={handleSignOut} className="mx-2">Sign Out</button>
+              {/* Hide login/register links when logged in */}
+              <Link href="/history" className="mx-2 hover:underline">
+                Booking History
+              </Link>
+              {/* Access user role from session.user (set in callbacks) */}
+              {session?.user?.role === "admin" && (
+                <Link href="/dashboard" className="mx-2 hover:underline">
+                  Dashboard
+                </Link>
+              )}{" "}
+              {/* Assuming session.user has a role */}
+              {/* Show user name/email from session data */}
+              {session?.user?.email && (
+                <span className="mx-2 text-sm text-gray-300">
+                  Logged in as: {session.user.email}
+                </span>
+              )}{" "}
+              {/* Assuming session.user has email */}
+              {/* Use next-auth's signOut function - it clears the cookie and updates session state */}
+              <button
+                onClick={() => signOut()}
+                className="mx-2 hover:underline focus:outline-none"
+              >
+                Sign Out
+              </button>
             </>
           ) : (
+            // --- Links for Logged-out Users ---
             <>
-              <Link href="/login" className="mx-2">Login</Link>
-              <Link href="/register" className="mx-2">Register</Link>
+              {/* Show Login link only if NOT on the login page */}
+              {!isLoginPage && (
+                // Link to your login page
+                <Link href="/login" className="mx-2 hover:underline">
+                  Login
+                </Link>
+                // If you wanted to use signIn for a provider button directly:
+                // <button onClick={() => signIn('credentials')} className="mx-2 hover:underline">Login</button>
+              )}
+              {/* Show Register link only if NOT on the register page */}
+              {!isRegisterPage && (
+                <Link href="/register" className="mx-2 hover:underline">
+                  Register
+                </Link>
+              )}
             </>
           )}
         </div>
