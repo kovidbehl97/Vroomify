@@ -35,8 +35,10 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <SessionProvider session={session}>
+          <div className="relative">
           <NavBar />
           {children}
+          </div>
           </SessionProvider>
       </body>
     </html>

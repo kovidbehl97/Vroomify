@@ -23,12 +23,12 @@ export default function Filter({
   };
 
   return (
-    <div className="mr-4">
-      <label className="block mb-1">{label}</label>
+    <div className="mr-4 relative bottom-3">
+      <label className="block mb-1 text-gray-600 text-[14px]">{label}</label>
       <select
         value={value}
         onChange={handleChange}
-        className="border p-2 rounded"
+        className="border border-gray-300 p-2 rounded-none text-gray-600"
       >
         <option value="">All</option>
         {options.map((option) => (

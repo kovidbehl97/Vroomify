@@ -45,7 +45,7 @@ console.log(pickupDate)
   return (
     <form>
       <section>
-        <button type="button" onClick={handleCheckout}>
+        <button className=' w-full bg-black font-bold text-white px-4 h-[47px] cursor-pointer mt-10 mb-5' type="button" onClick={handleCheckout}>
           Proceed to Checkout
         </button>
       </section>

@@ -22,9 +22,9 @@ export default function SearchBar({ onSearch, onPageReset }: SearchBarProps) {
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder="Search cars..."
-        className="border p-2 rounded"
+        className="border p-2 border-gray-300 rounded-none w-md "
       />
-      <button type="submit" className="bg-blue-600 text-white p-2 rounded ml-2">
+      <button type="submit" className="bg-black text-white p-2 ml-2 w-36 rounded-none">
         Search
       </button>
     </form>

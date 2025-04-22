@@ -60,22 +60,21 @@ const GoogleSignInButton = ({ onError, onSuccess, loading }: GoogleSignInButtonP
       onClick={handleGoogleLogin}
       disabled={loading} // Use isLoading derived from internal or parent state
       style={{
-        padding: '0.75rem 1.5rem',
         cursor: loading ? 'not-allowed' : 'pointer',
-        width: '100%',
-        background: '#4285F4',
-        color: 'white',
-        border: 'none',
-        borderRadius: '0.25rem', // Added border-radius
-        fontWeight: 'bold', // Added font-weight
-        display: 'flex', // Added flex
-        alignItems: 'center', // Added align-items
-        justifyContent: 'center', // Added justify-content
+        border: 'none', // Added border-radius// Added font-weight
+        display: 'flex', // Added flex// Added justify-content
         gap: '0.5rem', // Added gap between icon/text if you add an icon
       }}
-      className="hover:bg-blue-700 transition-colors max-w-md mx-auto mt-5" // Added hover class
+      className=" bg-[#f2f2f2]  mt-5 text-white w-full flex items-center justify-between shadow-md shadow-gray-200 border border-gray-200" // Added hover class
     >
+      <div className='h-[47px] w-[47px] flex items-center bg-[#f2f2f2] justify-center'>
+      <span className="h-[47px] w-[47px] bg-[url(/google-btn.png)] bg-contain bg-no-repeat bg-center"></span>
+      </div>
+      {/* Optional: Add a loading spinner or icon here */}
+      <span className='flex w-full justify-center text-gray-600 mr-5 font-bold'>
+
       {loading ? 'Signing in...' : 'Sign in with Google'}
+      </span>
     </button>
   );
 };
