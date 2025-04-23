@@ -1,3 +1,4 @@
+// file:/app/_lib/api.ts
 import { Car, Booking } from './types';
 import { getSession } from 'next-auth/react';
 

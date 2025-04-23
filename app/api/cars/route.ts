@@ -58,8 +58,8 @@ export async function POST(request: Request) {
   }
   // No 'client' declaration needed outside try/catch now that finally is gone
   try {
-    const { make, model, year, pricePerDay, mileage, carType, transmission } = await request.json();
-    if (!make || !model || !year || !pricePerDay || !mileage || !carType || !transmission) {
+    const { make, model, year, price, mileage, carType, transmission } = await request.json();
+    if (!make || !model || !year || !price || !mileage || !carType || !transmission) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
@@ -71,14 +71,14 @@ export async function POST(request: Request) {
       make,
       model,
       year,
-      pricePerDay,
+      price,
       mileage,
       carType,
       transmission,
     });
     console.log('POST /api/cars - Created car:', { _id: result.insertedId });
     return NextResponse.json(
-      { _id: result.insertedId, make, model, year, pricePerDay, mileage, carType, transmission },
+      { _id: result.insertedId, make, model, year, price, mileage, carType, transmission },
       { status: 201 }
     );
   } catch (error: any) {

@@ -29,12 +29,12 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
   }
   try {
-    const { make, model, year, pricePerDay, available } = await request.json();
+    const { make, model, year, price, available } = await request.json();
     const updateFields: any = {};
     if (make) updateFields.make = make;
     if (model) updateFields.model = model;
     if (year) updateFields.year = year;
-    if (pricePerDay) updateFields.pricePerDay = pricePerDay;
+    if (price) updateFields.price = price;
     if (available !== undefined) updateFields.available = available;
 
     // Get the connected client (getMongoClient should handle connection pooling)
