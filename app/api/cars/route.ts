@@ -1,4 +1,3 @@
-// app/api/cars/route.ts
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../_lib/auth";

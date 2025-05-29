@@ -20,7 +20,6 @@ export default function BookingFormClient({ carId }: BookingFormClientProps) {
   const [carPrice, setCarPrice] = useState<string>("");
   const router = useRouter();
 
-  // Fetch car price
   useEffect(() => {
     const fetchCarPrice = async () => {
       try {
@@ -62,7 +61,6 @@ export default function BookingFormClient({ carId }: BookingFormClientProps) {
     carPrice
   );
 
-  // Helpers to format time
   const formatTime = (date: Date | null) =>
     date ? date.toTimeString().slice(0, 5) : "";
 

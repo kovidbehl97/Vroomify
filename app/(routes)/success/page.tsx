@@ -1,4 +1,3 @@
-// app/(routes)/bookings/success/page.tsx
 import Link from "next/link";
 import { stripe } from "../../_lib/stripe";
 import { redirect } from "next/navigation";

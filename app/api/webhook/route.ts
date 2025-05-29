@@ -1,4 +1,3 @@
-// app/api/webhook/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { Buffer } from 'buffer';
@@ -114,6 +113,6 @@ export async function POST(req: NextRequest) {
       return new NextResponse('Failed to process session logic: Unknown error', { status: 500 });
     }
   }
-  
+
   return new NextResponse('Webhook handled', { status: 200 });
 }
