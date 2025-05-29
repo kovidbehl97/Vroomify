@@ -1,8 +1,6 @@
-// file:/app/_lib/api.ts
 import { Car, Booking } from "./types";
 import { getSession } from "next-auth/react";
 
-// Fetch all cars with query parameters
 export async function fetchCars(params: {
   search?: string;
   carType?: string;
@@ -35,7 +33,6 @@ export async function fetchCars(params: {
   }
 }
 
-// Fetch a single car by ID
 export async function fetchCar(id: string) {
   try {
     const res = await fetch(`/api/cars/${id}`, {
@@ -54,7 +51,6 @@ export async function fetchCar(id: string) {
   }
 }
 
-// Create a booking
 export async function createBooking(data: {
   carId: string;
   startDate: string;
@@ -86,7 +82,6 @@ export async function createBooking(data: {
   }
 }
 
-// Fetch booking history
 export async function fetchBookingHistory() {
   const session = await getSession();
   if (!session || !session.user) {
@@ -111,7 +106,6 @@ export async function fetchBookingHistory() {
   }
 }
 
-// Create a car (admin only)
 export async function createCar(data: Partial<Car>) {
   const session = await getSession();
   if (!session || !session.user || session.user.role !== "admin") {
@@ -138,7 +132,6 @@ export async function createCar(data: Partial<Car>) {
   }
 }
 
-// Update a car (admin only)
 export async function updateCar(id: string, data: Partial<Car>) {
   const session = await getSession();
   if (!session || !session.user || session.user.role !== "admin") {
@@ -165,7 +158,6 @@ export async function updateCar(id: string, data: Partial<Car>) {
   }
 }
 
-// Delete a car (admin only)
 export async function deleteCar(id: string) {
   const session = await getSession();
   if (!session || !session.user || session.user.role !== "admin") {
@@ -191,7 +183,6 @@ export async function deleteCar(id: string) {
   }
 }
 
-// Register a user
 export async function registerUser(data: {
   email: string;
   password: string;

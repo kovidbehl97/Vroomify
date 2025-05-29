@@ -89,10 +89,8 @@ export default function AdminCarModal({
 
       if (operation === "add") {
         await createCar(carDataToSubmit);
-        console.log("Car added successfully");
       } else if (operation === "edit" && car?._id) {
         await updateCar(car._id.toString(), carDataToSubmit);
-        console.log(`Car ${car._id} updated successfully`);
       }
       onSuccess();
     } catch (err: unknown) {
@@ -114,14 +112,11 @@ export default function AdminCarModal({
       setError(null);
       try {
         await deleteCar(car._id.toString());
-        console.log(`Car ${car._id} deleted successfully`);
         onSuccess();
       } catch (err: unknown) {
         if (err instanceof Error) {
-          console.error(`Error during delete car operation:`, err.message);
           setError(err.message || "Failed to delete car.");
         } else {
-          console.error(`Error during delete car operation:`, err);
           setError("Failed to delete car.");
         }
       } finally {

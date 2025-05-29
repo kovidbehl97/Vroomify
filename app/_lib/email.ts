@@ -1,7 +1,5 @@
-// File: _lib/email.ts
 import nodemailer from 'nodemailer';
 
-// Create a transporter using your Brevo SMTP credentials from environment variables
 const transporter = nodemailer.createTransport({
   host: "smtp.mailersend.net",
   port: 587,
@@ -20,7 +18,7 @@ interface BookingDetails {
   };
   pickupDate: string;
   dropoffDate: string;
-  amount?: number; // optional if you want to show price
+  amount?: number;
   currency?: string;
 }
 
@@ -68,9 +66,7 @@ export async function sendBookingConfirmation(toEmail: string, bookingDetails: B
       </div>
       `,
     };
-
     await transporter.sendMail(mailOptions);
-    console.log("Booking receipt email sent successfully!");
   } catch (error: unknown) {
     if (error instanceof Error) {
       console.error("Error sending email:", error.message);

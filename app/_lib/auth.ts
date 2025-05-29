@@ -1,4 +1,3 @@
-// app/lib/auth.ts
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
 import { getMongoClient } from "./mongodb";
 import { AuthOptions } from "next-auth";

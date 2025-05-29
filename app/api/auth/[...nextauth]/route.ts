@@ -1,4 +1,3 @@
-// app/api/auth/[...nextauth]/route.ts
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -59,11 +58,10 @@ const handler = NextAuth({
     },
   },
   session: {
-    strategy: "jwt" as const, // TS fix
+    strategy: "jwt" as const,
   },
   secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === "development",
 });
 
-// ✅ Export handler for App Router API
 export { handler as GET, handler as POST };

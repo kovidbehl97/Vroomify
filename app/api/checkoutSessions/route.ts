@@ -1,4 +1,3 @@
-// File: /app/api/checkout_sessions/route.ts
 import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { stripe } from '../../_lib/stripe';
@@ -16,20 +15,15 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { carId, pickupDate, dropoffDate, pickupTime, dropoffTime, location } = body;
 
-    // 1. Basic input validation
     if (!carId || !pickupDate || !dropoffDate || !pickupTime || !dropoffTime || !location) {
       console.error('API Error: Missing required booking data');
       return NextResponse.json({ error: 'Missing booking data' }, { status: 400 });
     }
-
-    // 2. Fetch and validate car details
     const carDetails: Car | null = await getCarDetails(carId);
     if (!carDetails) {
       console.error('API Error: Car not found with ID:', carId);
       return NextResponse.json({ error: 'Car not found' }, { status: 404 });
     }
-
-    // 3. Validate price and dates before calculation
     const priceAsNumber = Number(carDetails.price);
     const startDate = new Date(pickupDate);
     const endDate = new Date(dropoffDate);
@@ -39,19 +33,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid car price or date' }, { status: 400 });
     }
     
-    // 4. Calculate total price and ensure it's an integer
     const totalPrice = calculateTotalPrice(priceAsNumber, startDate, endDate);
     const totalPriceInCents = Math.round(totalPrice * 100);
-
-    // 5. Get user session for metadata
     const usersession = await getServerSession(authOptions);
     const sessionUser = usersession?.user;
-    
-    // 6. Log data for debugging before Stripe API call
-    console.log('Creating Stripe checkout session with the following data:');
-    console.log('  Car Price:', priceAsNumber, 'Total Price:', totalPrice, 'Total Price in Cents:', totalPriceInCents);
-    console.log('  User Email:', sessionUser?.email || 'guest@example.com');
-
     const session = await stripe.checkout.sessions.create({
       customer_email: sessionUser?.email || 'guest@example.com',
       billing_address_collection: 'auto',
@@ -84,7 +69,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ sessionId: session.id });
   } catch (err: unknown) {
-    // Log the specific error message from Stripe for detailed debugging
     if (err instanceof Error) {
       console.error('Stripe checkout error:', err.message);
       return NextResponse.json({ error: err.message || 'Internal Server Error' }, { status: 500 });
@@ -94,8 +78,6 @@ export async function POST(req: Request) {
     }
   }
 }
-
-// Helper functions (no changes needed here)
 async function getCarDetails(carId: string): Promise<Car | null> {
   try {
     const client = await getMongoClient();

@@ -1,4 +1,3 @@
-// app/(routes)/page.tsx
 import Hero from "../_components/Hero";
 import CarList from "../_components/CarList";
 

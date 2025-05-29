@@ -1,14 +1,12 @@
-// app/(routes)/login/page.tsx
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { signIn } from "next-auth/react"; // Import signIn
-import GoogleSignInButton from "../../_components/GoogleSignInButton"; // Assuming this component exists and handles the signIn('google') call internally or via a prop
+import { signIn } from "next-auth/react";
+import GoogleSignInButton from "../../_components/GoogleSignInButton";
 
 export default function LoginPage() {
-  // Renamed to LoginPage
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -16,35 +14,27 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(""); // Clear previous errors
+    setError("");
 
-    // Use the signIn function with the 'credentials' provider
     const result = await signIn("credentials", {
-      redirect: false, // Prevent NextAuth.js from redirecting automatically
+      redirect: false,
       email,
       password,
-      // callbackUrl: '/' // Optional: specify where to redirect after successful login
     });
 
     if (result?.error) {
-      // Check for result and result.error
-      setError(result.error); // NextAuth.js provides an error message here
+      setError(result.error);
     } else {
-      // Login successful, redirect to the homepage or callbackUrl
-      router.push("/"); // Redirect to homepage on success
-      // or router.push(result?.url || '/'); // Redirect to callbackUrl if available
+      router.push("/");
     }
   };
-
-  // Assuming GoogleSignInButton component handles its own click and calls signIn('google')
-  // If not, you'd have an onClick handler here calling signIn('google')
 
   return (
     <div className="container mx-auto py-10">
       <h1 className="text-2xl underline font-black text-black mb-6 text-center">
         Log In
       </h1>
-      {/* Added text-center */}
+
       <div className="max-w-md mx-auto p-6 shadow-md border border-gray-100">
         <form onSubmit={handleSubmit} className=" bg-white ">
           <div className="mb-4">
@@ -79,14 +69,12 @@ export default function LoginPage() {
             type="submit"
             className="w-full bg-black font-bold text-white px-4 h-[47px] cursor-pointer "
           >
-            {/* Made button full width */}
             Log In
           </button>
         </form>
 
-        {/* Centered Google button area */}
         <p className="my-4 w-full text-center">OR</p>
-        {/* GoogleSignInButton component should handle its own onClick calling signIn('google') */}
+
         <GoogleSignInButton />
       </div>
       <p className="mt-4 text-center">
@@ -97,7 +85,6 @@ export default function LoginPage() {
         >
           Sign Up Here
         </Link>
-        {/* Corrected link to /signup */}
       </p>
     </div>
   );

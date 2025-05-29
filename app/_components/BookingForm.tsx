@@ -40,20 +40,37 @@ export default function BookingFormClient({ carId }: BookingFormClientProps) {
     e.preventDefault();
     setError("");
 
-    if (!pickupDate || !dropoffDate || !pickupTime || !dropoffTime || !location || !carId) {
+    if (
+      !pickupDate ||
+      !dropoffDate ||
+      !pickupTime ||
+      !dropoffTime ||
+      !location ||
+      !carId
+    ) {
       setError("Please fill in all required fields.");
       return;
     }
   };
 
-  const isFormValid = !!(pickupDate && dropoffDate && pickupTime && dropoffTime && location && carPrice);
+  const isFormValid = !!(
+    pickupDate &&
+    dropoffDate &&
+    pickupTime &&
+    dropoffTime &&
+    location &&
+    carPrice
+  );
 
   // Helpers to format time
-  const formatTime = (date: Date | null) => date ? date.toTimeString().slice(0, 5) : "";
+  const formatTime = (date: Date | null) =>
+    date ? date.toTimeString().slice(0, 5) : "";
 
   return (
     <div className="container mx-auto py-10 relative">
-      <h1 className="text-3xl font-bold mb-6 text-center w-full">Book Your Car</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center w-full">
+        Book Your Car
+      </h1>
 
       <button
         className="bg-black text-white shadow-md px-4 py-2 absolute top-4 left-4"
@@ -71,7 +88,9 @@ export default function BookingFormClient({ carId }: BookingFormClientProps) {
               {/* Date pickers */}
               <div className="flex gap-4">
                 <div className="mb-4 w-full">
-                  <label className="block mb-1 text-gray-700">Pick-up Date</label>
+                  <label className="block mb-1 text-gray-700">
+                    Pick-up Date
+                  </label>
                   <DatePicker
                     selected={pickupDate}
                     onChange={(date) => setPickupDate(date)}
@@ -80,7 +99,9 @@ export default function BookingFormClient({ carId }: BookingFormClientProps) {
                   />
                 </div>
                 <div className="mb-4 w-full">
-                  <label className="block mb-1 text-gray-700">Drop-off Date</label>
+                  <label className="block mb-1 text-gray-700">
+                    Drop-off Date
+                  </label>
                   <DatePicker
                     selected={dropoffDate}
                     onChange={(date) => setDropoffDate(date)}
@@ -93,7 +114,9 @@ export default function BookingFormClient({ carId }: BookingFormClientProps) {
               {/* Time pickers */}
               <div className="flex gap-4">
                 <div className="mb-4 w-full">
-                  <label className="block mb-1 text-gray-700">Pick-up Time</label>
+                  <label className="block mb-1 text-gray-700">
+                    Pick-up Time
+                  </label>
                   <DatePicker
                     selected={pickupTime}
                     onChange={(date) => setPickupTime(date)}
@@ -106,7 +129,9 @@ export default function BookingFormClient({ carId }: BookingFormClientProps) {
                   />
                 </div>
                 <div className="mb-4 w-full">
-                  <label className="block mb-1 text-gray-700">Drop-off Time</label>
+                  <label className="block mb-1 text-gray-700">
+                    Drop-off Time
+                  </label>
                   <DatePicker
                     selected={dropoffTime}
                     onChange={(date) => setDropoffTime(date)}
@@ -122,7 +147,9 @@ export default function BookingFormClient({ carId }: BookingFormClientProps) {
 
               {/* Location */}
               <div className="mb-4">
-                <label className="block mb-1 text-gray-700">Pick-up Location</label>
+                <label className="block mb-1 text-gray-700">
+                  Pick-up Location
+                </label>
                 <select
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
@@ -130,7 +157,9 @@ export default function BookingFormClient({ carId }: BookingFormClientProps) {
                   required
                 >
                   <option value="Square One Mall">Square One Mall</option>
-                  <option value="Pearson International Airport (YYZ)">Pearson International Airport (YYZ)</option>
+                  <option value="Pearson International Airport (YYZ)">
+                    Pearson International Airport (YYZ)
+                  </option>
                   <option value="Union Station">Union Station</option>
                 </select>
               </div>

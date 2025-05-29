@@ -36,7 +36,6 @@ export default async function Success({ searchParams }: SuccessPageProps) {
   const { customer_details, line_items } = session;
   const customerEmail = customer_details?.email || "Customer";
 
-  // Safely type the booked item
   let bookedItem: Stripe.Product | null = null;
   const lineItem = line_items?.data[0];
   if (lineItem?.price?.product && typeof lineItem.price.product !== "string") {
@@ -60,7 +59,9 @@ export default async function Success({ searchParams }: SuccessPageProps) {
                 <strong>Car:</strong> {bookedItem.name}
               </li>
               <li>
-                <strong>Price:</strong> {lineItem?.price?.currency?.toUpperCase()}{" "}{((lineItem?.price?.unit_amount ?? 0) / 100).toFixed(2)}
+                <strong>Price:</strong>{" "}
+                {lineItem?.price?.currency?.toUpperCase()}{" "}
+                {((lineItem?.price?.unit_amount ?? 0) / 100).toFixed(2)}
               </li>
             </ul>
           </div>

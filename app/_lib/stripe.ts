@@ -1,4 +1,3 @@
-// app/_lib/stripe.ts
 import 'server-only'
 
 import Stripe from 'stripe'

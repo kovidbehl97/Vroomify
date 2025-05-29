@@ -1,4 +1,3 @@
-// app/api/cars/[id]/route.ts
 import { ObjectId } from 'mongodb';
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
@@ -6,10 +5,9 @@ import { authOptions } from '../../../_lib/auth';
 import { getMongoClient } from '../../../_lib/mongodb';
 
 export async function GET(request: Request) {
-  // Extract `id` from the URL
   const url = new URL(request.url);
   const segments = url.pathname.split('/');
-  const id = segments[segments.length - 1]; // last segment is the car ID
+  const id = segments[segments.length - 1];
 
   try {
     const client = await getMongoClient();
