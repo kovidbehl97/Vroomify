@@ -69,6 +69,7 @@ export default async function BookingHistoryPage() {
               return null;
             }
           } catch (e) {
+            console.warn(`Error processing Car ObjectId: ${id}`, e);
             return null;
           }
         })
@@ -80,9 +81,12 @@ export default async function BookingHistoryPage() {
             _id: { $in: carObjectIds },
           })
           .toArray();
+        console.warn(`Found ${cars.length} car documents for bookings.`);
       } else {
+        console.warn("No valid car ObjectIds found among user bookings.");
       }
     } else {
+      console.warn("No car IDs found in user bookings.");
     }
     const carDetailsMap = new Map<string, Car>();
     cars.forEach((car) => carDetailsMap.set(car._id.toString(), car));
@@ -93,6 +97,9 @@ export default async function BookingHistoryPage() {
       if (carDetails) {
         bookingWithCar.carDetails = carDetails;
       } else {
+        console.warn(
+          `Car details not found in DB for carId: ${booking.carId} referenced in booking ${booking._id}.`
+        );
       }
       bookingsWithCar.push(bookingWithCar);
     });
@@ -101,6 +108,7 @@ export default async function BookingHistoryPage() {
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
   } catch (error) {
+    console.error("Failed to fetch booking history:", error);
     return (
       <div className="container mx-auto mt-8">
         <h1 className="text-2xl font-bold">Booking History</h1>
