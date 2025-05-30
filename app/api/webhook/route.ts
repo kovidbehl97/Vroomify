@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
           const existingBooking = await bookingsCollection.findOne({ sessionId: sessionWithDetails.id });
 
           if (!existingBooking) {
-            const result = await bookingsCollection.insertOne(bookingData);
+            await bookingsCollection.insertOne(bookingData);
             await sendBookingConfirmation(bookingDetails.customerEmail, bookingDetails);
           } 
         } catch (mongoError: unknown) {
