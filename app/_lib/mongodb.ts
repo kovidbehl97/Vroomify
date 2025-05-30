@@ -17,6 +17,7 @@ export async function getMongoClient(): Promise<MongoClient> {
       const client = await globalWithMongo._mongoClientPromise;
       return client;
     } catch (error) {
+      throw error;
     }
   }
 
